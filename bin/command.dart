@@ -8,7 +8,7 @@ class Command {
 
   Command(this.modName, this.cmdName, this.args, this.msg);
 
-  TextChannel get_channel() {
+  TextChannel getChannel() {
     return this.msg.channel.getFromCache();
   }
 }

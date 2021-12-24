@@ -4,11 +4,15 @@ import 'package:nyxx/nyxx.dart';
 import 'command.dart';
 import 'modules/bot.dart';
 import 'modules/time.dart';
+import 'modules/message.dart';
+
+var bot;
+var deleteNextMsg = false;
 
 void main() {
   DotEnv.load();
   final token = DotEnv.env['BOT_TOKEN'];
-  final bot = Nyxx(token, GatewayIntents.allUnprivileged);
+  bot = Nyxx(token, GatewayIntents.allUnprivileged);
 
   bot.onReady.listen(onReady);
   bot.onMessageReceived.listen(onMessageReceive);
@@ -18,6 +22,11 @@ void onReady(ReadyEvent event) {}
 
 void onMessageReceive(MessageReceivedEvent event) {
   final msg = event.message;
+
+  if (deleteNextMsg) {
+    msg.delete();
+    deleteNextMsg = false;
+  }
 
   if (msg.author.bot) return;
 
@@ -31,6 +40,9 @@ void onMessageReceive(MessageReceivedEvent event) {
     switch (cmd.modName.toLowerCase()) {
       case 'bot':
         BotModule.run(cmd);
+        break;
+      case 'msg':
+        MessageModule.run(cmd);
         break;
       case 'time':
         TimeModule.run(cmd);
