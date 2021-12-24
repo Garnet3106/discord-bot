@@ -1,24 +1,54 @@
+import 'dart:io';
+
 import 'package:dotenv/dotenv.dart' as DotEnv;
 import 'package:nyxx/nyxx.dart';
+import 'package:yaml/yaml.dart' as Yaml;
 
 import 'command.dart';
 import 'modules/bot.dart';
 import 'modules/time.dart';
 import 'modules/message.dart';
 
-var bot;
-var deleteNextMsg = false;
+Nyxx bot;
+Yaml.YamlMap botData;
+bool deleteNextMsg = false;
 
 void main() {
   DotEnv.load();
-  final token = DotEnv.env['BOT_TOKEN'];
+  final String token = DotEnv.env['BOT_TOKEN'];
   bot = Nyxx(token, GatewayIntents.allUnprivileged);
 
   bot.onReady.listen(onReady);
   bot.onMessageReceived.listen(onMessageReceive);
 }
 
-void onReady(ReadyEvent event) {}
+void onReady(ReadyEvent event) {
+  loadBotData();
+  print('[event] Bot is ready.');
+}
+
+void loadBotData() {
+  try {
+    String botDataSrc =
+        new File(DotEnv.env['BOT_DATA_PATH']).readAsStringSync();
+    botData = Yaml.loadYaml(botDataSrc);
+  } catch (_e) {
+    print('[err] Failed to load bot data.');
+    bot.dispose();
+  }
+
+  print('[event] Bot data has been loaded.');
+}
+
+void saveBotData() {
+  try {
+    new File(DotEnv.env['BOT_DATA_PATH']).writeAsStringSync(botData.toString());
+  } catch (_e) {
+    print('[err] Failed to save bot data.');
+  }
+
+  print('[event] Bot data has been saved.');
+}
 
 void onMessageReceive(MessageReceivedEvent event) {
   final msg = event.message;

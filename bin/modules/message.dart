@@ -1,5 +1,4 @@
 import 'package:nyxx/nyxx.dart';
-import '../TestBOT.dart';
 import 'module.dart';
 import '../command.dart';
 

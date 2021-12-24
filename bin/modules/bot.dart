@@ -1,5 +1,6 @@
 import 'package:nyxx/nyxx.dart';
 import 'module.dart';
+import '../TestBOT.dart';
 import '../command.dart';
 
 class BotModule {
@@ -14,16 +15,21 @@ class BotModule {
           modName,
           [
             EmbedFieldElement('help', 'show command help', true),
-            EmbedFieldElement('exit', 'exit the bot application', true),
+            EmbedFieldElement('dis', 'disconnect the bot application', true),
           ],
         );
         break;
-      case 'exit':
+      case 'dis':
         var embed = EmbedBuilder();
+        embed.author = Module.getEmbedAuthor(cmd.msg.author);
+        embed.description = 'disconnecting...';
         embed.title = 'BOT Operation';
-        embed.description = 'exiting...';
         var msg = MessageBuilder.embed(embed);
-        cmd.msg.channel.getFromCache()?.sendMessage(msg);
+        cmd.msg.channel
+            .getFromCache()
+            ?.sendMessage(msg)
+            ?.then((_value) => saveBotData())
+            ?.then((_value) => bot.dispose());
         break;
     }
   }

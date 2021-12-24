@@ -11,3 +11,4 @@ dependencies:
   nyxx:
     git:
       url: git://github.com/l7ssha/nyxx.git
+  yaml: ^3.1.0
