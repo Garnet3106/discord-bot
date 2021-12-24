@@ -10,24 +10,29 @@ void main() {
   final token = DotEnv.env['BOT_TOKEN'];
   final bot = Nyxx(token, GatewayIntents.allUnprivileged);
 
+  bot.onReady.listen(onReady);
   bot.onMessageReceived.listen(onMessageReceive);
 }
 
+void onReady(ReadyEvent event) {}
+
 void onMessageReceive(MessageReceivedEvent event) {
-  if (event.message.author.bot) return;
+  final msg = event.message;
+
+  if (msg.author.bot) return;
 
   // todo: ダブルクォーテーションに対応
-  final args = event.message.content.split(" ");
-  final cmd_chain = args[0].split(".");
+  final args = msg.content.split(' ');
+  final cmd_chain = args[0].split('.');
 
   if (cmd_chain.length == 2) {
-    var cmd = Command(cmd_chain[0], cmd_chain[1], args, event.message);
+    var cmd = Command(cmd_chain[0], cmd_chain[1], args, msg);
 
     switch (cmd.modName.toLowerCase()) {
-      case "bot":
+      case 'bot':
         BotModule.run(cmd);
         break;
-      case "time":
+      case 'time':
         TimeModule.run(cmd);
         break;
     }

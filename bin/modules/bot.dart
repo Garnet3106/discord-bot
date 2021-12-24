@@ -4,13 +4,13 @@ import '../command.dart';
 class BotModule {
   static void run(Command cmd) {
     switch (cmd.cmdName) {
-      case "help":
+      case 'help':
         BotModule.sendHelp(cmd.get_channel());
         break;
-      case "exit":
+      case 'exit':
         var embed = EmbedBuilder();
-        embed.title = "BOT Operation";
-        embed.description = "exiting...";
+        embed.title = 'BOT Operation';
+        embed.description = 'exiting...';
         var msg = MessageBuilder.embed(embed);
         cmd.msg.channel.getFromCache()?.sendMessage(msg);
         break;
@@ -19,8 +19,8 @@ class BotModule {
 
   static void sendHelp(TextChannel channel) {
     var embed = EmbedBuilder();
-    embed.title = "Command Help - bot";
-    embed.description = "command list";
+    embed.title = 'Command Help - bot';
+    embed.description = 'command list';
     var msg = MessageBuilder.embed(embed);
     channel.sendMessage(msg);
   }
