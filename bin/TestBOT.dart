@@ -1,11 +1,13 @@
+import 'package:dotenv/dotenv.dart' as DotEnv;
 import 'package:nyxx/nyxx.dart';
+
 import 'command.dart';
 import 'modules/bot.dart';
 import 'modules/time.dart';
 
-const token = 'OTIyMTAyNjEzODcxMzE2OTky.Yb8k-g.XElWhgQdDpPO1ewG5ml7fDtBEq0';
-
 void main() {
+  DotEnv.load();
+  final token = DotEnv.env['BOT_TOKEN'];
   final bot = Nyxx(token, GatewayIntents.allUnprivileged);
 
   bot.onMessageReceived.listen(onMessageReceive);

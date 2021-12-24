@@ -7,6 +7,7 @@ environment:
   sdk: '>=2.10.0 <3.0.0'
 
 dependencies:
+  dotenv: ^3.0.0
   nyxx:
     git:
       url: git://github.com/l7ssha/nyxx.git
