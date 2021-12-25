@@ -22,8 +22,8 @@ class BotModule {
       case 'dis':
         var embed = EmbedBuilder();
         embed.author = Module.getEmbedAuthor(cmd.msg.author);
-        embed.description = 'disconnecting...';
-        embed.title = 'BOT Operation';
+        embed.description = 'Bot will be disconnected soon...';
+        embed.title = 'Bot Operation';
         var msg = MessageBuilder.embed(embed);
         cmd.msg.channel
             .getFromCache()

@@ -6,20 +6,28 @@ import 'package:yaml/yaml.dart' as Yaml;
 
 import 'command.dart';
 import 'modules/bot.dart';
+import 'modules/module.dart';
+import 'modules/profile.dart';
 import 'modules/time.dart';
 import 'modules/message.dart';
 
-Nyxx bot;
-Yaml.YamlMap botData;
+late Nyxx bot;
+Map<String, Profile> profiles = {};
 bool deleteNextMsg = false;
 
 void main() {
   DotEnv.load();
-  final String token = DotEnv.env['BOT_TOKEN'];
+  final String token = DotEnv.env['BOT_TOKEN'] ??
+      terminate('Environment variable \'BOT_TOKEN\' not found.');
   bot = Nyxx(token, GatewayIntents.allUnprivileged);
 
   bot.onReady.listen(onReady);
   bot.onMessageReceived.listen(onMessageReceive);
+}
+
+dynamic terminate(String msg) {
+  print('[err] ${msg}');
+  bot.dispose();
 }
 
 void onReady(ReadyEvent event) {
@@ -29,12 +37,18 @@ void onReady(ReadyEvent event) {
 
 void loadBotData() {
   try {
-    String botDataSrc =
-        new File(DotEnv.env['BOT_DATA_PATH']).readAsStringSync();
-    botData = Yaml.loadYaml(botDataSrc);
-  } catch (_e) {
-    print('[err] Failed to load bot data.');
-    bot.dispose();
+    final String botDataPath = DotEnv.env['BOT_DATA_PATH'] ??
+        terminate('Environment variable \'BOT_DATA_PATH\' not found.');
+
+    String botDataSrc = new File(botDataPath).readAsStringSync();
+    Yaml.YamlMap yamlMap = Yaml.loadYaml(botDataSrc);
+    Yaml.YamlNode? profilesNode = yamlMap.nodes['profiles'];
+
+    profilesNode?.value?.forEach((key, node) {
+      profiles[key] = Profile.fromYamlNode(node);
+    });
+  } catch (e) {
+    terminate('Failed to load bot data.');
   }
 
   print('[event] Bot data has been loaded.');
@@ -42,7 +56,12 @@ void loadBotData() {
 
 void saveBotData() {
   try {
-    new File(DotEnv.env['BOT_DATA_PATH']).writeAsStringSync(botData.toString());
+    final String botDataPath = DotEnv.env['BOT_DATA_PATH'] ??
+        terminate('Environment variable \'BOT_DATA_PATH\' not found.');
+
+    List<String> lines = [];
+    profiles.forEach((key, value) => lines.add(value.toYamlText(key)));
+    new File(botDataPath).writeAsStringSync('profiles:\n' + lines.join('\n'));
   } catch (_e) {
     print('[err] Failed to save bot data.');
   }
@@ -67,16 +86,32 @@ void onMessageReceive(MessageReceivedEvent event) {
   if (cmd_chain.length == 2) {
     var cmd = Command(cmd_chain[0], cmd_chain[1], args, msg);
 
-    switch (cmd.modName.toLowerCase()) {
-      case 'bot':
-        BotModule.run(cmd);
-        break;
-      case 'msg':
-        MessageModule.run(cmd);
-        break;
-      case 'time':
-        TimeModule.run(cmd);
-        break;
+    try {
+      switch (cmd.modName.toLowerCase()) {
+        case 'bot':
+          BotModule.run(cmd);
+          break;
+        case 'msg':
+          MessageModule.run(cmd);
+          break;
+        case 'prof':
+          ProfileModule.run(cmd);
+          break;
+        case 'time':
+          TimeModule.run(cmd);
+          break;
+      }
+    } catch (e) {
+      if (e is String) {
+        print('[mod] exception message on module: ${e}');
+
+        var embed = EmbedBuilder();
+        embed.author = Module.getEmbedAuthor(cmd.msg.author);
+        embed.description = e;
+        embed.title = '[Error]';
+
+        cmd.getChannel().sendMessage(MessageBuilder.embed(embed));
+      }
     }
   }
 }
