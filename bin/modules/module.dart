@@ -14,12 +14,22 @@ class Module {
 
   static void sendHelp(TextChannel channel, IMessageAuthor author,
       String cmdName, List<EmbedFieldElement> fields) {
-    var embed = EmbedBuilder();
-    embed.author = Module.getEmbedAuthor(author);
-    embed.description = 'command list';
-    embed.title = '[${cmdName.toUpperCase()}] Command Help';
+    var embed = Module.getEmbed(author,
+        '[${cmdName.toUpperCase()}] Command Help', 'command list', fields);
 
-    fields.forEach((element) {
+    var msg = MessageBuilder.embed(embed);
+    channel.sendMessage(msg);
+  }
+
+  static EmbedBuilder getEmbed(IMessageAuthor author, String title, String desc,
+      [List<EmbedFieldElement>? fields = null]) {
+    var embed = EmbedBuilder();
+
+    embed.author = Module.getEmbedAuthor(author);
+    embed.description = desc;
+    embed.title = title;
+
+    fields?.forEach((element) {
       embed.addField(
         name: element.name,
         content: element.content,
@@ -27,8 +37,7 @@ class Module {
       );
     });
 
-    var msg = MessageBuilder.embed(embed);
-    channel.sendMessage(msg);
+    return embed;
   }
 
   static EmbedAuthorBuilder getEmbedAuthor(IMessageAuthor author) {

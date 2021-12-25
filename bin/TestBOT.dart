@@ -104,12 +104,7 @@ void onMessageReceive(MessageReceivedEvent event) {
     } catch (e) {
       if (e is String) {
         print('[mod] exception message on module: ${e}');
-
-        var embed = EmbedBuilder();
-        embed.author = Module.getEmbedAuthor(cmd.msg.author);
-        embed.description = e;
-        embed.title = '[Error]';
-
+        var embed = Module.getEmbed(cmd.msg.author, '[Error]', e);
         cmd.getChannel().sendMessage(MessageBuilder.embed(embed));
       }
     }

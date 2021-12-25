@@ -14,16 +14,13 @@ class MessageModule {
           modName,
           [
             EmbedFieldElement('help', 'show command help', true),
-            EmbedFieldElement('pin', 'pin a new message', true),
+            EmbedFieldElement('pin <msg>', 'pin a new message', true),
           ],
         );
         break;
       case 'pin':
-        var embed = EmbedBuilder();
-        embed.author = Module.getEmbedAuthor(cmd.msg.author);
-        embed.description = cmd.msg.content.substring('${modName}.pin'.length);
-        embed.title = 'Pin Message';
-
+        var embed = Module.getEmbed(cmd.msg.author, 'Pin Message',
+            cmd.msg.content.substring('${modName}.pin'.length));
         var msg = MessageBuilder.embed(embed);
 
         cmd

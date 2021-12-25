@@ -36,8 +36,22 @@ class ModuleProfile {
 }
 
 class ProfileModule {
+  static String modName = 'prof';
+
   static void run(Command cmd) {
     switch (cmd.cmdName) {
+      case 'help':
+        Module.sendHelp(
+          cmd.getChannel(),
+          cmd.msg.author,
+          modName,
+          [
+            EmbedFieldElement('help', 'show command help', true),
+            EmbedFieldElement('add <msg>', 'add a new profile', true),
+            EmbedFieldElement('save', 'save the profile data', true),
+          ],
+        );
+        break;
       case 'add':
         final profileName = cmd.getArgumentAt(1);
 
@@ -48,11 +62,8 @@ class ProfileModule {
         var newProfile = Profile(cmd.msg.author.id, DateTime.now());
         profiles[profileName] = newProfile;
 
-        var embed = EmbedBuilder();
-        embed.author = Module.getEmbedAuthor(cmd.msg.author);
-        embed.description = 'Profile \'${profileName}\' has been added.';
-        embed.title = 'Profile Data';
-
+        var embed = Module.getEmbed(cmd.msg.author, 'Profile Data',
+            'Profile \'${profileName}\' has been added.');
         cmd.getChannel().sendMessage(MessageBuilder.embed(embed));
 
         print('[event] Profile \'${profileName}\' has been added.');
@@ -60,11 +71,8 @@ class ProfileModule {
       case 'save':
         saveBotData();
 
-        var embed = EmbedBuilder();
-        embed.author = Module.getEmbedAuthor(cmd.msg.author);
-        embed.description = 'Profile data was saved successfully.';
-        embed.title = 'Profile Data';
-
+        var embed = Module.getEmbed(cmd.msg.author, 'Profile Data',
+            'Profile data was saved successfully.');
         cmd.getChannel().sendMessage(MessageBuilder.embed(embed));
         break;
     }

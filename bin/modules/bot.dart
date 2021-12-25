@@ -20,27 +20,15 @@ class BotModule {
         );
         break;
       case 'dis':
-        var embed = EmbedBuilder();
-        embed.author = Module.getEmbedAuthor(cmd.msg.author);
-        embed.description = 'Bot will be disconnected soon...';
-        embed.title = 'Bot Operation';
+        var embed = Module.getEmbed(cmd.msg.author, 'Bot Operation',
+            'Bot will be disconnected soon...');
         var msg = MessageBuilder.embed(embed);
-        cmd.msg.channel
-            .getFromCache()
-            ?.sendMessage(msg)
-            ?.then((_value) => saveBotData())
-            ?.then((_value) => bot.dispose());
+        cmd
+            .getChannel()
+            .sendMessage(msg)
+            .then((_value) => saveBotData())
+            .then((_value) => bot.dispose());
         break;
     }
-  }
-
-  static void sendHelp(TextChannel channel, IMessageAuthor author) {
-    var embed = EmbedBuilder();
-    embed.author = Module.getEmbedAuthor(author);
-    embed.description = 'command list';
-    embed.title = 'Command Help - bot';
-
-    var msg = MessageBuilder.embed(embed);
-    channel.sendMessage(msg);
   }
 }
